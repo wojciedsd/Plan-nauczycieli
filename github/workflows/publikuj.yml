@@ -4,8 +4,8 @@ on:
   push:
     branches: [main]
   schedule:
-    - cron: "0 4 * * *"   # codziennie rano pobiera świeży plan
-  workflow_dispatch:       # ręczne uruchomienie przyciskiem
+    - cron: "0 4 * * *"
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -27,8 +27,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Pobierz plan z EduPage
-        run: node update-data.js
+      - name: Pobierz plan z EduPage (jeśli się nie uda, zostaje zapisany dane.json)
+        run: node update-data.js || echo "Nie udało się pobrać nowych danych, używam zapisanego pliku dane.json"
+      - name: Sprawdź, czy plik z danymi istnieje
+        run: test -f dane.json
       - name: Przygotuj pliki strony
         run: |
           mkdir site
